@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   // ADMIN, DOCTOR, PATIENT, PHARMACIST
+  firstName String
+  lastName  String
+  isLocked  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient   Patient?
+  doctor    Doctor?
+}
+
+model Patient {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique
+  dateOfBirth    DateTime
+  bloodType      String?
+  medicalHistory String?
+  user           User     @relation(fields: [userId], references: [id])
+  
+  appointments   Appointment[]
+  prescriptions  Prescription[]
+  adherenceLogs  AdherenceLog[]
+}
+
+model Doctor {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique
+  specialization String
+  clinicAddress  String?
+  profileImage   String?  // <--- ADDED Profile Photo Output path
+  licenseImage   String?  // <--- ADDED License Document Output path
+  isVerified     Boolean  @default(false)
+  user           User     @relation(fields: [userId], references: [id])
+
+  appointments   Appointment[]
+  prescriptions  Prescription[]
+}
+
+model Appointment {
+  id        Int      @id @default(autoincrement())
+  patientId Int
+  doctorId  Int
+  date      DateTime
+  status    String   // SCHEDULED, COMPLETED, CANCELLED
+  notes     String?
+  
+  patient   Patient  @relation(fields: [patientId], references: [id])
+  doctor    Doctor   @relation(fields: [doctorId], references: [id])
+}
+
+model Prescription {
+  id           Int      @id @default(autoincrement())
+  patientId    Int
+  doctorId     Int
+  diagnosis    String
+  dateIssued   DateTime @default(now())
+  
+  patient      Patient  @relation(fields: [patientId], references: [id])
+  doctor       Doctor   @relation(fields: [doctorId], references: [id])
+
+  medications  PrescriptionMedication[]
+}
+
+model Medication {
+  id               Int      @id @default(autoincrement())
+  name             String   @unique
+  activeIngredient String
+  description      String?
+
+  prescriptions    PrescriptionMedication[]
+  inventory        Inventory?
+  interactions1    DrugInteraction[] @relation("Medication1")
+  interactions2    DrugInteraction[] @relation("Medication2")
+}
+
+model PrescriptionMedication {
+  id             Int      @id @default(autoincrement())
+  prescriptionId Int
+  medicationId   Int
+  dosage         String
+  frequency      String
+  durationDays   Int
+
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id])
+  medication     Medication   @relation(fields: [medicationId], references: [id])
+  adherenceLogs  AdherenceLog[]
+}
+
+model AdherenceLog {
+  id                       Int      @id @default(autoincrement())
+  patientId                Int
+  prescriptionMedicationId Int
+  dateTaken                DateTime @default(now())
+  status                   String   // TAKEN, MISSED
+  
+  patient                  Patient  @relation(fields: [patientId], references: [id])
+  prescriptionMedication   PrescriptionMedication @relation(fields: [prescriptionMedicationId], references: [id])
+}
+
+model Inventory {
+  id           Int        @id @default(autoincrement())
+  medicationId Int        @unique
+  stockLevel   Int
+  lastRestock  DateTime   @default(now())
+
+  medication   Medication @relation(fields: [medicationId], references: [id])
+}
+
+model DrugInteraction {
+  id             Int        @id @default(autoincrement())
+  medication1Id  Int
+  medication2Id  Int
+  severity       String     // LOW, MODERATE, HIGH
+  description    String
+  
+  medication1    Medication @relation("Medication1", fields: [medication1Id], references: [id])
+  medication2    Medication @relation("Medication2", fields: [medication2Id], references: [id])
+}

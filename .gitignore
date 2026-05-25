@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Environment & secrets
+.env
+.env.example
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# Database
+*.db
+*.db-journal
+
+# Logs & temp files
+*.log
+result.txt
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.claude/
+.vscode/
+.idea/
+
+# Prisma generated (if applicable)
+server/generated/
