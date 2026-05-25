@@ -3,8 +3,8 @@ import useAuthStore from "../store/useAuthStore";
 
 // Configure Axios instance for backend calls
 export const api = axios.create({
-  // baseURL: 'http://localhost:5002/api',
-  baseURL: "https://unroasted-hulk-designing.ngrok-free.dev/api",
+  baseURL: "http://localhost:5002/api",
+  // baseURL: "https://unroasted-hulk-designing.ngrok-free.dev/api",
 });
 
 // Request Interceptor: Attach JWT Token if user is logged in
