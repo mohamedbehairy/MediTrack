@@ -3,8 +3,9 @@ import useAuthStore from "../store/useAuthStore";
 
 // Configure Axios instance for backend calls
 export const api = axios.create({
-  baseURL: "https://meditrack-production-599b.up.railway.app/api",
-  // baseURL: "http://localhost:5002/api",
+  // baseURL: "https://meditrack-production-599b.up.railway.app/api",
+
+  baseURL: "http://localhost:5002/api",
 });
 
 // Request Interceptor: Attach JWT Token if user is logged in
